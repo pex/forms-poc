@@ -1,36 +1,57 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# React Forms POC
 
-## Getting Started
+A proof-of-concept for building forms in Next.js with React Server Actions, featuring auto-save and type-safe form state management.
 
-First, run the development server:
+## Features
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- **Server Actions** - Form submission and auto-save via React Server Actions
+- **Auto-save** - Debounced auto-save on field changes (500ms)
+- **Type-safe** - Generic types flow from schema through context to fields
+- **Zod validation** - Schema validation with field-level error messages
+- **Context-based state** - Form fields automatically receive their values and errors via React Context
+
+## Architecture
+
+```
+Form (useActionState + context provider)
+  └── FormProvider (inputs + errors)
+        ├── TextField (useFieldState)
+        ├── CheckboxList (useFieldState)
+        └── ...
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Key Files
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- `app/types/form.ts` - Shared types (`FormFields`, `ActionResponse`, `FormAction`)
+- `app/components/form.tsx` - Main form component with submit and auto-save actions
+- `app/components/form-context.tsx` - Context provider and `useFieldState` hook
+- `app/components/text-field.tsx` - Text input component
+- `app/components/checkbox-list.tsx` - Checkbox group component
+- `app/actions/submit-form.tsx` - Server actions with Zod validation
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Usage
 
-## Learn More
+```tsx
+<Form
+  action={submitForm}
+  autoSaveAction={autoSaveForm}
+  initialState={{
+    success: false,
+    message: "",
+    inputs: { title: "", list: [] },
+  }}
+>
+  <TextField name="title" label="Title" />
+  <CheckboxList name="list" options={{ one: "One", two: "Two" }} />
+  <button type="submit">Submit</button>
+</Form>
+```
 
-To learn more about Next.js, take a look at the following resources:
+Fields automatically receive their values and errors from context - no prop drilling required.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Running
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+npm install
+npm run dev
+```

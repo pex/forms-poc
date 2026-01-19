@@ -1,11 +1,11 @@
 "use client";
 
 import { createContext, useContext } from "react";
-import { FormFields, FormErrors } from "../types/form";
+import { FormFields, FieldValidations } from "../types/form";
 
 interface FormContextValue<TFields extends FormFields> {
   inputs: TFields;
-  errors: FormErrors<TFields>;
+  validations: FieldValidations<TFields>;
 }
 
 const FormContext = createContext<FormContextValue<FormFields> | null>(null);
@@ -17,11 +17,11 @@ interface FormProviderProps<TFields extends FormFields>
 
 export function FormProvider<TFields extends FormFields>({
   inputs,
-  errors,
+  validations,
   children,
 }: FormProviderProps<TFields>) {
   return (
-    <FormContext.Provider value={{ inputs, errors }}>
+    <FormContext.Provider value={{ inputs, validations }}>
       {children}
     </FormContext.Provider>
   );
@@ -36,10 +36,28 @@ export function useFormContext<TFields extends FormFields>() {
 }
 
 export function useFieldState<T = unknown>(name: string) {
-  const { inputs, errors } = useFormContext();
+  const { inputs, validations: allValidations } = useFormContext();
+  const value = inputs[name] as T | undefined;
+  const validations = allValidations[name];
+
+  const validationId = `validations-${name}`;
+  const hasValidations = validations && validations.length > 0;
+
+  const validationProps = {
+    "aria-invalid": hasValidations || undefined,
+    "aria-describedby": hasValidations ? validationId : undefined,
+  };
+
+  const validationHint = hasValidations && (
+    <p className="validator-hint" id={validationId}>
+      {validations.join(", ")}
+    </p>
+  );
 
   return {
-    value: inputs[name] as T | undefined,
-    errors: errors[name],
+    value,
+    validations,
+    validationProps,
+    validationHint,
   };
 }

@@ -16,9 +16,7 @@ export function TextField<TFields extends FormFields>({
   className,
   ...props
 }: TextFieldProps<TFields>) {
-  const { value, errors } = useFieldState(name);
-  const errorId = `errors-${name}`;
-  const hasErrors = errors && errors.length > 0;
+  const { value, validationProps, validationHint } = useFieldState<string>(name);
 
   return (
     <div className="w-xs">
@@ -28,17 +26,12 @@ export function TextField<TFields extends FormFields>({
       <input
         id={name}
         name={name}
-        defaultValue={value as string}
-        aria-invalid={hasErrors || undefined}
-        aria-describedby={hasErrors ? errorId : undefined}
+        defaultValue={value}
         className={`input validator ${className ?? ""}`}
         {...props}
+        {...validationProps}
       />
-      {hasErrors && (
-        <p className="validator-hint" id={errorId}>
-          {errors.join(", ")}
-        </p>
-      )}
+      {validationHint}
     </div>
   );
 }

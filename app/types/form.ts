@@ -1,6 +1,6 @@
 export type FormFields = Record<string, unknown>;
 
-export type FormErrors<TFields extends FormFields> = {
+export type FieldValidations<TFields extends FormFields> = {
   [K in keyof TFields]?: string[];
 };
 
@@ -9,7 +9,7 @@ export interface ActionResponse<TFields extends FormFields> {
   message: string;
   notify?: boolean;
   inputs?: TFields;
-  errors?: FormErrors<TFields>;
+  validations?: FieldValidations<TFields>;
 }
 
 export type FormAction<TFields extends FormFields> = (

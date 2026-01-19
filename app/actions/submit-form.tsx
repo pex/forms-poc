@@ -29,8 +29,8 @@ export async function submitForm(
   if (!result.success) {
     return {
       success: false,
-      message: "Please fix the errors in the form",
-      errors: result.error.flatten().fieldErrors,
+      message: "Please fix the validation issues in the form",
+      validations: result.error.flatten().fieldErrors,
       inputs,
     };
   }
@@ -50,7 +50,7 @@ export async function autoSaveForm(
 
   return {
     success: true,
-    message: "Saved successfully!",
+    message: "Autosaved successfully!",
     notify: true,
     inputs,
   };

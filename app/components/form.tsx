@@ -25,14 +25,16 @@ export function Form<TFields extends FormFields>({
   ...props
 }: FormProps<TFields>) {
   const formRef = useRef<HTMLFormElement>(null);
-  const [formSubmitState, formSubmitAction] = useActionState(
-    action,
+
+  const noopAction: FormAction<TFields> = async () => initialState;
+
+  const [autoSaveState, autoSaveSubmitAction] = useActionState(
+    autoSaveAction ?? noopAction,
     initialState,
   );
 
-  const noopAction: FormAction<TFields> = async () => initialState;
-  const [autoSaveState, autoSaveSubmitAction] = useActionState(
-    autoSaveAction ?? noopAction,
+  const [formSubmitState, formSubmitAction] = useActionState(
+    action,
     initialState,
   );
 
@@ -43,6 +45,12 @@ export function Form<TFields extends FormFields>({
     });
   }, 500);
 
+  // Use formSubmitState.inputs when there are validation issues to preserve user input
+  // Otherwise use autoSaveState.inputs
+  const inputs = formSubmitState.validations
+    ? formSubmitState.inputs
+    : autoSaveState.inputs;
+
   return (
     <form
       ref={formRef}
@@ -51,10 +59,8 @@ export function Form<TFields extends FormFields>({
       {...props}
     >
       <FormProvider
-        inputs={
-          (autoSaveAction ? autoSaveState.inputs : formSubmitState.inputs) ?? {}
-        }
-        errors={formSubmitState.errors ?? {}}
+        inputs={inputs ?? {}}
+        validations={formSubmitState.validations ?? {}}
       >
         {children}
       </FormProvider>

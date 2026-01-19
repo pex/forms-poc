@@ -12,18 +12,12 @@ export function CheckboxList<TFields extends FormFields>({
   name,
   options,
 }: CheckboxListProps<TFields>) {
-  const { value, errors } = useFieldState(name);
-  const defaultValue = (value as string[]) ?? [];
-  const errorId = `errors-${name}`;
-  const hasErrors = errors && errors.length > 0;
+  const { value, validationProps, validationHint } = useFieldState<string[]>(name);
+  const defaultValue = value ?? [];
 
   return (
     <div>
-      <fieldset
-        aria-invalid={hasErrors || undefined}
-        aria-describedby={hasErrors ? errorId : undefined}
-        className="flex gap-3 validator"
-      >
+      <fieldset {...validationProps} className="flex gap-3 validator">
         {Object.entries(options).map(([optionValue, label]) => (
           <label className="label" key={optionValue}>
             <input
@@ -37,11 +31,7 @@ export function CheckboxList<TFields extends FormFields>({
           </label>
         ))}
       </fieldset>
-      {hasErrors && (
-        <p className="validator-hint" id={errorId}>
-          {errors.join(", ")}
-        </p>
-      )}
+      {validationHint}
     </div>
   );
 }

@@ -9,10 +9,10 @@
     "lint": "eslint"
   },
   "dependencies": {
-    "daisyui": "^5.5.14",
     "next": "16.1.2",
     "react": "19.2.3",
     "react-dom": "19.2.3",
+    "tailwind-merge": "^3.4.0",
     "usehooks-ts": "^3.1.1",
     "zod": "^4.3.5"
   },

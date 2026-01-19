@@ -4,15 +4,24 @@ export type FieldValidations<TFields extends FormFields> = {
   [K in keyof TFields]?: string[];
 };
 
-export interface ActionResponse<TFields extends FormFields> {
+export interface SubmitResponse<TFields extends FormFields> {
   success: boolean;
-  message: string;
-  notify?: boolean;
-  inputs?: TFields;
+  message?: string;
+  inputs: TFields;
   validations?: FieldValidations<TFields>;
 }
 
-export type FormAction<TFields extends FormFields> = (
-  prevState: ActionResponse<TFields> | null,
+export interface AutoSaveResponse {
+  success: boolean;
+  message?: string;
+}
+
+export type SubmitAction<TFields extends FormFields> = (
+  prevState: SubmitResponse<TFields>,
   formData: FormData,
-) => Promise<ActionResponse<TFields>>;
+) => Promise<SubmitResponse<TFields>>;
+
+export type AutoSaveAction = (
+  prevState: AutoSaveResponse,
+  formData: FormData,
+) => Promise<AutoSaveResponse>;

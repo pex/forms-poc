@@ -1,57 +1,44 @@
 "use server";
 
 import z from "zod";
-import { ActionResponse } from "../types/form";
+import { SubmitResponse, AutoSaveResponse } from "../types/form";
+import { getInputs } from "../utils/form-data";
 
 const formSchema = z.object({
   title: z.string().min(3, "Title must have at least 3 characters"),
-  list: z.array(z.string()).min(1, "At least one item must be selected"),
-  depender: z.string()
+  description: z.string().min(10, "Description must have at least 10 characters"),
+  category: z.string().min(1, "Please select a category"),
+  priority: z.preprocess((val) => val ?? "", z.string().min(1, "Please select a priority")),
+  tags: z.preprocess(
+    (val) => (val === undefined ? [] : Array.isArray(val) ? val : [val]),
+    z.array(z.string()).min(1, "At least one tag must be selected")
+  ),
+  depender: z.string(),
 });
 
 export type FormInputs = z.input<typeof formSchema>;
 
-function getInputs(formData: FormData): FormInputs {
-  return {
-    title: formData.get("title") as string,
-    list: formData.getAll("list") as string[],
-    depender: formData.get("depender") as string
-  };
-}
-
 export async function submitForm(
-  _prevState: ActionResponse<FormInputs> | null,
+  _prevState: SubmitResponse<FormInputs>,
   formData: FormData,
-): Promise<ActionResponse<FormInputs>> {
-  const inputs = getInputs(formData);
+): Promise<SubmitResponse<FormInputs>> {
+  const inputs = getInputs<FormInputs>(formData);
   const result = formSchema.safeParse(inputs);
 
   if (!result.success) {
     return {
       success: false,
-      message: "Please fix the validation issues in the form",
-      validations: result.error.flatten().fieldErrors,
       inputs,
+      validations: result.error.flatten().fieldErrors,
     };
   }
 
-  return {
-    success: true,
-    message: "Form saved successfully!",
-    inputs,
-  };
+  return { success: true, inputs };
 }
 
 export async function autoSaveForm(
-  _prevState: ActionResponse<FormInputs> | null,
-  formData: FormData,
-): Promise<ActionResponse<FormInputs>> {
-  const inputs = getInputs(formData);
-
-  return {
-    success: true,
-    message: "Autosaved successfully!",
-    notify: true,
-    inputs,
-  };
+  _prevState: AutoSaveResponse,
+  _formData: FormData,
+): Promise<AutoSaveResponse> {
+  return { success: true, message: "Autosaved" };
 }

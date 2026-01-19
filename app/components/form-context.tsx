@@ -49,7 +49,7 @@ export function useFieldState<T = unknown>(name: string) {
   };
 
   const validationHint = hasValidations && (
-    <p className="validator-hint" id={validationId}>
+    <p className="text-sm text-error mt-1" id={validationId}>
       {validations.join(", ")}
     </p>
   );

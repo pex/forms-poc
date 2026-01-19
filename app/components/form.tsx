@@ -51,7 +51,9 @@ export function Form<TFields extends FormFields>({
       {...props}
     >
       <FormProvider
-        inputs={autoSaveState.inputs ?? {}}
+        inputs={
+          (autoSaveAction ? autoSaveState.inputs : formSubmitState.inputs) ?? {}
+        }
         errors={formSubmitState.errors ?? {}}
       >
         {children}
